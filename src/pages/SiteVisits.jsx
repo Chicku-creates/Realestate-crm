@@ -1,7 +1,21 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { Navbar } from '../components/Navbar'
-import { format, isToday, isTomorrow, isPast } from 'date-fns'
+const format = (date, fmt) => {
+  const d = new Date(date)
+  if (fmt === 'dd') return d.getDate().toString().padStart(2, '0')
+  if (fmt === 'MMM') return d.toLocaleString('en-IN', { month: 'short' })
+  if (fmt === 'h:mm a') return d.toLocaleString('en-IN', { hour: 'numeric', minute: '2-digit', hour12: true })
+  if (fmt === 'dd MMM') return `${d.getDate()} ${d.toLocaleString('en-IN', { month: 'short' })}`
+  return d.toLocaleDateString('en-IN')
+}
+const isToday = (date) => new Date(date).toDateString() === new Date().toDateString()
+const isTomorrow = (date) => {
+  const tomorrow = new Date()
+  tomorrow.setDate(tomorrow.getDate() + 1)
+  return new Date(date).toDateString() === tomorrow.toDateString()
+}
+const isPast = (date) => new Date(date) < new Date()
 
 const T = {
   bg:       '#13141F',
