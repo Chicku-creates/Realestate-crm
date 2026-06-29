@@ -37,6 +37,7 @@ export function Inventory() {
   })
   const [saving, setSaving] = useState(false)
   const navigate = useNavigate()
+  const [search, setSearch] = useState('')
 
   useEffect(() => { fetchProjects() }, [])
 
@@ -48,6 +49,14 @@ export function Inventory() {
       .order('created_at', { ascending: false })
     setProjects(data || [])
     setLoading(false)
+  }
+
+  async function handleDeleteProject(e, id) {
+    e.stopPropagation()
+    if (!confirm('Delete this project and all its units? This cannot be undone.')) return
+    await supabase.from('units').delete().eq('project_id', id)
+    await supabase.from('projects').delete().eq('id', id)
+    fetchProjects()
   }
 
   async function handleAddProject() {
@@ -66,7 +75,7 @@ export function Inventory() {
       <main style={{ flex: 1, padding: '0', overflow: 'auto' }}>
         {/* Top bar */}
         <div style={{
-          padding: '16px 28px',
+          padding: window.innerWidth < 768 ? '14px 16px' : '16px 28px',
           borderBottom: `1px solid ${T.border}`,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           backgroundColor: T.bg, position: 'sticky', top: 0, zIndex: 10,
@@ -88,7 +97,36 @@ export function Inventory() {
         </div>
 
         {/* Projects Grid */}
-        <div style={{ padding: '24px 28px' }}>
+        <div style={{ padding: window.innerWidth < 768 ? '16px 14px' : '24px 28px' }}>
+
+          {/* Search box */}
+          <div style={{ marginBottom: '20px', position: 'relative', maxWidth: '360px' }}>
+            <span style={{
+              position: 'absolute', left: '11px', top: '50%', transform: 'translateY(-50%)',
+              fontSize: '14px', pointerEvents: 'none',
+            }}>🔍</span>
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Search by project name, builder or location..."
+              style={{
+                width: '100%', backgroundColor: T.surface, border: `1px solid ${T.border}`,
+                borderRadius: '8px', padding: '8px 12px 8px 32px', color: T.text,
+                fontSize: '13px', outline: 'none', boxSizing: 'border-box',
+              }}
+            />
+            {search && (
+              <button
+                onClick={() => setSearch('')}
+                style={{
+                  position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)',
+                  background: 'none', border: 'none', color: T.textMuted,
+                  fontSize: '14px', cursor: 'pointer', padding: 0,
+                }}
+              >✕</button>
+            )}
+          </div>
+
           {loading ? (
             <p style={{ color: T.textMuted }}>Loading...</p>
           ) : projects.length === 0 ? (
@@ -99,10 +137,12 @@ export function Inventory() {
           ) : (
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+              gridTemplateColumns: window.innerWidth < 768 ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))',
               gap: '16px',
             }}>
-              {projects.map(project => (
+              {projects.filter(p =>
+                `${p.project_name} ${p.builder_name} ${p.location}`.toLowerCase().includes(search.toLowerCase())
+              ).map(project => (
                 <div
                   key={project.id}
                   onClick={() => navigate(`/inventory/${project.id}`)}
@@ -161,9 +201,23 @@ export function Inventory() {
                   <div style={{
                     marginTop: '16px', paddingTop: '12px',
                     borderTop: `1px solid ${T.border}`,
-                    color: T.textMuted, fontSize: '12px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                   }}>
-                    {project.units?.[0]?.count || 0} units
+                    <span style={{ color: T.textMuted, fontSize: '12px' }}>
+                      {project.units?.[0]?.count || 0} units
+                    </span>
+                    <button
+                      onClick={e => handleDeleteProject(e, project.id)}
+                      style={{
+                        background: 'transparent', border: `1px solid #EF444433`,
+                        borderRadius: '5px', padding: '3px 10px',
+                        color: T.danger, fontSize: '11px', cursor: 'pointer',
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.backgroundColor = '#EF444411'}
+                      onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+                    >
+                      🗑 Delete
+                    </button>
                   </div>
                 </div>
               ))}

@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import { Layout } from '../components/Layout'
 import { LeadCard } from '../components/LeadCard'
 import { LeadForm } from '../components/LeadForm'
+import { LeadDetailModal } from '../components/LeadDetailModal'
 import { Dialog } from '../components/ui/dialog'
 import { Button } from '../components/ui/button'
 import { LEAD_STATUSES, LEAD_SOURCES } from '../lib/utils'
@@ -205,6 +206,7 @@ export function Leads() {
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingLead, setEditingLead] = useState(null)
+  const [detailLead, setDetailLead] = useState(null)
   const [saving, setSaving] = useState(false)
   const [visitLead, setVisitLead] = useState(null)
 const [visitForm, setVisitForm] = useState({ visit_date: '', location: '', notes: '' })
@@ -226,12 +228,30 @@ const handleScheduleVisit = async (form) => {
   const [filterStatus, setFilterStatus] = useState('')
   const [filterSource, setFilterSource] = useState('')
 
+  
   const fetchLeads = async () => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('leads')
-      .select('*')
+      .select(`
+        *,
+        units!leads_interested_unit_id_fkey (
+          id,
+          unit_number,
+          bhk_type,
+          floor_number,
+          price,
+          status,
+          projects (
+            id,
+            project_name,
+            builder_name
+          )
+        )
+      `)
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
+    
+    if (error) console.error('fetchLeads error:', error)
     setLeads(data || [])
     setLoading(false)
   }
@@ -292,11 +312,11 @@ const handleScheduleVisit = async (form) => {
         <div
           style={{
             borderBottom: `1px solid ${T.border}`,
-            padding: '18px 32px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            backgroundColor: T.surface,
+            padding: window.innerWidth < 768 ? '14px 16px' : '18px 32px',
+display: 'flex',
+alignItems: 'center',
+justifyContent: 'space-between',
+backgroundColor: T.surface,
             position: 'sticky',
             top: 0,
             zIndex: 10,
@@ -320,16 +340,17 @@ const handleScheduleVisit = async (form) => {
         </div>
 
         {/* ── Content ── */}
-        <div style={{ padding: '24px 32px' }}>
+        <div style={{ padding: window.innerWidth < 768 ? '16px 14px' : '24px 32px' }}>
 
           {/* Filter bar */}
           <div
             style={{
-              display: 'flex',
-              gap: '10px',
-              marginBottom: '22px',
-              alignItems: 'center',
-            }}
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: '10px',
+  marginBottom: '22px',
+  alignItems: 'center',
+}}
           >
             <DarkInput
               placeholder="Search by name or phone…"
@@ -377,11 +398,11 @@ const handleScheduleVisit = async (form) => {
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: '14px',
-              }}
-            >
-              {[...Array(6)].map((_, i) => (
+gridTemplateColumns: window.innerWidth < 768 ? '1fr' : 'repeat(3, 1fr)',
+gap: '14px',
+}}
+>
+{[...Array(6)].map((_, i) => (
                 <div
                   key={i}
                   style={{
@@ -402,16 +423,17 @@ const handleScheduleVisit = async (form) => {
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: '14px',
-              }}
-            >
-              {filtered.map(lead => (
+gridTemplateColumns: window.innerWidth < 768 ? '1fr' : 'repeat(3, 1fr)',
+gap: '14px',
+}}
+>
+{filtered.map(lead => (
                 <LeadCard
   key={lead.id}
   lead={lead}
   onEdit={openEdit}
   onDelete={handleDelete}
+  onViewDetail={(lead) => setDetailLead(lead)}
   onScheduleVisit={(lead) => { setVisitLead(lead); setVisitForm({ visit_date: '', location: '', notes: '' }) }}
 />
               ))}
@@ -527,8 +549,19 @@ const handleScheduleVisit = async (form) => {
           </div>
         </div>
       </div>
-    )}
+        )}
+    
+    <LeadDetailModal
+      lead={detailLead}
+      open={!!detailLead}
+      onClose={() => setDetailLead(null)}
+    />
 
+  <LeadDetailModal
+        lead={detailLead}
+        onClose={() => setDetailLead(null)}
+        onEdit={openEdit}
+      />
   </Layout>
 )
 }

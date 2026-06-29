@@ -25,12 +25,12 @@ export function LeadForm({ initial = {}, onSubmit, onCancel, loading }) {
   const [projects, setProjects] = useState([])
   const [units, setUnits] = useState([])
   const [selectedProject, setSelectedProject] = useState('')
+  const [unitError, setUnitError] = useState('')
 
   useEffect(() => {
     fetchProjects()
   }, [])
 
-  // When editing, preload the project from the existing unit
   useEffect(() => {
     if (initial.interested_unit_id && units.length === 0) {
       supabase
@@ -68,26 +68,26 @@ export function LeadForm({ initial = {}, onSubmit, onCancel, loading }) {
     const pid = e.target.value
     setSelectedProject(pid)
     setForm(f => ({ ...f, interested_unit_id: '' }))
+    setUnitError('')
     if (pid) fetchUnits(pid)
     else setUnits([])
   }
 
-  const handle = (e) => setForm(f => ({ ...f, [e.target.name]: e.target.value }))
+  const handle = (e) => {
+    setForm(f => ({ ...f, [e.target.name]: e.target.value }))
+    if (e.target.name === 'interested_unit_id') setUnitError('')
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    if (!form.interested_unit_id) {
+      setUnitError('Please select a unit before saving.')
+      return
+    }
     onSubmit({
       ...form,
       interested_unit_id: form.interested_unit_id || null,
     })
-  }
-
-  const STATUS_COLORS = {
-    available: '#10B981',
-    reserved: '#F59E0B',
-    booked: '#0EA5E9',
-    sold: '#64748B',
-    blocked: '#EF4444',
   }
 
   return (
@@ -145,18 +145,23 @@ export function LeadForm({ initial = {}, onSubmit, onCancel, loading }) {
           </Select>
         </div>
         <div>
-          <Label>Preferred Location</Label>
+          {/* ── CHANGE 1a: preferred_location marked Optional ── */}
+          <label style={{ display: 'flex', alignItems: 'baseline', gap: '5px', marginBottom: '4px' }}>
+            <span style={{ fontSize: '13px', fontWeight: 500 }}>Preferred Location</span>
+            <span style={{ fontSize: '11px', color: '#64748B', fontWeight: 400 }}>(Optional)</span>
+          </label>
           <Input name="preferred_location" value={form.preferred_location} onChange={handle} placeholder="e.g. Sector 62, Noida" />
         </div>
       </div>
 
-      {/* ── Inventory Picker ── */}
+      {/* ── CHANGE 1b: Interested Unit — now REQUIRED ── */}
       <div
         style={{
-          border: '1px solid #2A2D4A',
+          border: `1px solid ${unitError ? '#EF4444' : '#2A2D4A'}`,
           borderRadius: '10px',
           padding: '14px',
           backgroundColor: '#14152280',
+          transition: 'border-color 0.15s',
         }}
       >
         <p style={{
@@ -166,8 +171,12 @@ export function LeadForm({ initial = {}, onSubmit, onCancel, loading }) {
           color: '#5C6BC0',
           textTransform: 'uppercase',
           letterSpacing: '0.06em',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '4px',
         }}>
-          🏗️ Interested Unit (optional)
+          🏗️ Interested Unit
+          <span style={{ color: '#EF4444', fontSize: '14px', lineHeight: 1 }}>*</span>
         </p>
 
         {/* Project dropdown */}
@@ -196,7 +205,7 @@ export function LeadForm({ initial = {}, onSubmit, onCancel, loading }) {
           </select>
         </div>
 
-        {/* Unit dropdown — only shows after project selected */}
+        {/* Unit dropdown */}
         {selectedProject && (
           <div>
             <Label>Unit</Label>
@@ -237,7 +246,12 @@ export function LeadForm({ initial = {}, onSubmit, onCancel, loading }) {
         {form.interested_unit_id && (
           <button
             type="button"
-            onClick={() => { setForm(f => ({ ...f, interested_unit_id: '' })); setSelectedProject(''); setUnits([]) }}
+            onClick={() => {
+              setForm(f => ({ ...f, interested_unit_id: '' }))
+              setSelectedProject('')
+              setUnits([])
+              setUnitError('')
+            }}
             style={{
               marginTop: '8px',
               background: 'transparent',
@@ -252,6 +266,13 @@ export function LeadForm({ initial = {}, onSubmit, onCancel, loading }) {
           </button>
         )}
       </div>
+
+      {/* ── CHANGE 1c: Validation error message ── */}
+      {unitError && (
+        <p style={{ margin: '-8px 0 0', fontSize: '12px', color: '#EF4444', display: 'flex', alignItems: 'center', gap: '4px' }}>
+          ⚠️ {unitError}
+        </p>
+      )}
 
       <div>
         <Label>Follow-up Date & Time</Label>

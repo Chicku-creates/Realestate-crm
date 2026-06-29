@@ -100,7 +100,7 @@ export function SiteVisits() {
 
         {/* Top bar */}
         <div style={{
-          padding: '16px 28px', borderBottom: `1px solid ${T.border}`,
+          padding: window.innerWidth < 768 ? '14px 16px' : '16px 28px', borderBottom: `1px solid ${T.border}`,
           backgroundColor: T.bg, position: 'sticky', top: 0, zIndex: 10,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}>
@@ -114,10 +114,10 @@ export function SiteVisits() {
           </div>
         </div>
 
-        <div style={{ padding: '24px 28px' }}>
+        <div style={{ padding: window.innerWidth < 768 ? '16px 14px' : '24px 28px' }}>
 
           {/* Stats */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '24px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 768 ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '12px', marginBottom: '24px' }}>
             {[
               { label: 'Total',    value: stats.total,    color: T.indigo,  icon: '🗓️' },
               { label: 'Today',    value: stats.today,    color: T.amber,   icon: '⚡' },
@@ -179,8 +179,9 @@ export function SiteVisits() {
                   <div key={visit.id} style={{
                     backgroundColor: T.surface, border: `1px solid ${T.border}`,
                     borderRadius: '12px', padding: '18px 20px',
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    gap: '16px',
+                    display: 'flex', alignItems: window.innerWidth < 768 ? 'flex-start' : 'center',
+justifyContent: 'space-between',
+gap: '12px', flexWrap: window.innerWidth < 768 ? 'wrap' : 'nowrap',
                   }}>
 
                     {/* Date block */}

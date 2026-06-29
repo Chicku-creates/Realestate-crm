@@ -44,6 +44,11 @@ export function ProjectDetail() {
   const [saving, setSaving] = useState(false)
   const [filterStatus, setFilterStatus] = useState('all')
   const [editingUnit, setEditingUnit] = useState(null)
+const [filterBhk, setFilterBhk] = useState('all')
+const [filterAreaMin, setFilterAreaMin] = useState('')
+const [filterAreaMax, setFilterAreaMax] = useState('')
+const [filterPriceMin, setFilterPriceMin] = useState('')
+const [filterPriceMax, setFilterPriceMax] = useState('')
 
   useEffect(() => { fetchData() }, [projectId])
 
@@ -91,7 +96,17 @@ export function ProjectDetail() {
     setShowModal(true)
   }
 
-  const filtered = filterStatus === 'all' ? units : units.filter(u => u.status === filterStatus)
+  const hasAdvancedFilter = filterBhk !== 'all' || filterAreaMin || filterAreaMax || filterPriceMin || filterPriceMax
+
+const filtered = units.filter(u => {
+  if (filterStatus !== 'all' && u.status !== filterStatus) return false
+  if (filterBhk !== 'all' && u.bhk_type !== filterBhk) return false
+  if (filterAreaMin && Number(u.area_sqft) < Number(filterAreaMin)) return false
+  if (filterAreaMax && Number(u.area_sqft) > Number(filterAreaMax)) return false
+  if (filterPriceMin && Number(u.price) < Number(filterPriceMin)) return false
+  if (filterPriceMax && Number(u.price) > Number(filterPriceMax)) return false
+  return true
+})
 
   const stats = {
     total: units.length,
@@ -175,7 +190,126 @@ export function ProjectDetail() {
               </div>
             ))}
           </div>
+{/* Advanced Filter Panel */}
+<div style={{
+  backgroundColor: T.surface, border: `1px solid ${T.border}`,
+  borderRadius: '12px', padding: '14px 16px', marginBottom: '16px',
+}}>
+  <div style={{
+    display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'flex-end',
+  }}>
 
+    {/* BHK Filter */}
+    <div>
+      <p style={{ color: T.textMuted, fontSize: '10px', fontWeight: 600, margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Unit Type</p>
+      <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+        {['all', ...BHK_OPTIONS].map(b => (
+          <button
+            key={b}
+            onClick={() => setFilterBhk(b)}
+            style={{
+              padding: '4px 10px', borderRadius: '20px', fontSize: '11px',
+              fontWeight: 500, cursor: 'pointer', border: 'none',
+              backgroundColor: filterBhk === b ? T.accentPurple : '#20223A',
+              color: filterBhk === b ? 'white' : T.textMuted,
+            }}
+          >
+            {b === 'all' ? 'All' : b}
+          </button>
+        ))}
+      </div>
+    </div>
+
+    {/* Area Range */}
+    <div>
+      <p style={{ color: T.textMuted, fontSize: '10px', fontWeight: 600, margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Area (sqft)</p>
+      <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+        <input
+          type="number"
+          value={filterAreaMin}
+          onChange={e => setFilterAreaMin(e.target.value)}
+          placeholder="Min"
+          style={{
+            width: '80px', backgroundColor: T.bg, border: `1px solid ${T.border}`,
+            borderRadius: '7px', padding: '6px 10px', color: T.text,
+            fontSize: '12px', outline: 'none',
+          }}
+        />
+        <span style={{ color: T.textMuted, fontSize: '11px' }}>—</span>
+        <input
+          type="number"
+          value={filterAreaMax}
+          onChange={e => setFilterAreaMax(e.target.value)}
+          placeholder="Max"
+          style={{
+            width: '80px', backgroundColor: T.bg, border: `1px solid ${T.border}`,
+            borderRadius: '7px', padding: '6px 10px', color: T.text,
+            fontSize: '12px', outline: 'none',
+          }}
+        />
+      </div>
+    </div>
+
+    {/* Price Range */}
+    <div>
+      <p style={{ color: T.textMuted, fontSize: '10px', fontWeight: 600, margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Price (₹)</p>
+      <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+        <input
+          type="number"
+          value={filterPriceMin}
+          onChange={e => setFilterPriceMin(e.target.value)}
+          placeholder="e.g. 3000000"
+          style={{
+            width: '110px', backgroundColor: T.bg, border: `1px solid ${T.border}`,
+            borderRadius: '7px', padding: '6px 10px', color: T.text,
+            fontSize: '12px', outline: 'none',
+          }}
+        />
+        <span style={{ color: T.textMuted, fontSize: '11px' }}>—</span>
+        <input
+          type="number"
+          value={filterPriceMax}
+          onChange={e => setFilterPriceMax(e.target.value)}
+          placeholder="e.g. 10000000"
+          style={{
+            width: '110px', backgroundColor: T.bg, border: `1px solid ${T.border}`,
+            borderRadius: '7px', padding: '6px 10px', color: T.text,
+            fontSize: '12px', outline: 'none',
+          }}
+        />
+      </div>
+    </div>
+
+    {/* Match count + Clear button */}
+    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginLeft: 'auto' }}>
+      {(hasAdvancedFilter || filterStatus !== 'all') && (
+        <span style={{ color: T.textMuted, fontSize: '11px' }}>
+          <span style={{ color: T.accent, fontWeight: 700 }}>{filtered.length}</span> unit{filtered.length !== 1 ? 's' : ''} match
+        </span>
+      )}
+      {hasAdvancedFilter && (
+        <button
+          onClick={() => {
+            setFilterBhk('all')
+            setFilterAreaMin('')
+            setFilterAreaMax('')
+            setFilterPriceMin('')
+            setFilterPriceMax('')
+          }}
+          style={{
+            padding: '5px 12px', borderRadius: '7px', fontSize: '11px',
+            fontWeight: 600, cursor: 'pointer',
+            border: `1px solid ${T.danger}33`,
+            backgroundColor: '#EF444411', color: T.danger,
+          }}
+        >
+          ✕ Clear Filters
+        </button>
+      )}
+    </div>
+
+  </div>
+</div>
           {/* Filter tabs */}
           <div style={{ display: 'flex', gap: '6px', marginBottom: '16px' }}>
             {['all', ...Object.keys(STATUS_CONFIG)].map(s => (

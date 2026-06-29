@@ -149,7 +149,15 @@ export function Dashboard() {
   useEffect(() => {
     const fetchData = async () => {
       const [{ data: leadsData }, { data: unitsData }] = await Promise.all([
-        supabase.from('leads').select('*').eq('user_id', user.id),
+        supabase.from('leads')
+          .select(`
+            *,
+            units!leads_interested_unit_id_fkey (
+              id, unit_number, bhk_type, floor_number, price, status,
+              projects ( id, project_name, builder_name, commission_percent )
+            )
+          `)
+          .eq('user_id', user.id),
         supabase.from('units')
           .select('*, projects!inner(user_id, commission_percent)')
           .eq('projects.user_id', user.id)
@@ -225,6 +233,23 @@ export function Dashboard() {
       return true
     })
     .slice(0, 8)
+    // ── Total Earnings (Won leads with linked unit) ──
+  const wonLeads = leads.filter(l => l.status === 'Won' && l.units?.price && l.units?.projects?.commission_percent)
+
+  const calcEarning = (lead) => {
+    const price = lead.units?.price || 0
+    const pct   = lead.units?.projects?.commission_percent || 0
+    return price * (pct / 100)
+  }
+
+  const totalEarnings = wonLeads.reduce((sum, l) => sum + calcEarning(l), 0)
+
+  const earningsThisMonth = wonLeads
+    .filter(l => {
+      const d = new Date(l.created_at)
+      return d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear()
+    })
+    .reduce((sum, l) => sum + calcEarning(l), 0)
 
   // ── Commission Forecast ──
   const bookedUnits   = units.filter(u => u.status === 'booked')
@@ -255,12 +280,13 @@ export function Dashboard() {
   }[s] || { bg: T.textMut + '22', fg: T.textSec })
 
   const stats = [
-    { label: 'Total Leads',          value: totalLeads,        icon: '👥', accent: T.indigo  },
-    { label: 'Follow-ups Today',     value: followupsDue,      icon: '📅', accent: T.amber   },
-    { label: 'Follow-ups Tomorrow',  value: followupsTomorrow, icon: '📈', accent: T.purple  },
-    { label: 'Deals Won This Month', value: wonThisMonth,      icon: '🏆', accent: T.emerald },
+    { label: 'Total Leads',           value: totalLeads,               icon: '👥', accent: T.indigo  },
+    { label: 'Follow-ups Today',      value: followupsDue,             icon: '📅', accent: T.amber   },
+    { label: 'Follow-ups Tomorrow',   value: followupsTomorrow,        icon: '📈', accent: T.purple  },
+    { label: 'Deals Won This Month',  value: wonThisMonth,             icon: '🏆', accent: T.emerald },
+    { label: 'Total Earnings',        value: formatINR(totalEarnings), icon: '💵', accent: T.emerald },
+    { label: 'Earnings This Month',   value: formatINR(earningsThisMonth), icon: '📊', accent: T.sky },
   ]
-
   return (
     <Layout>
       <div style={{
@@ -269,7 +295,7 @@ export function Dashboard() {
       }}>
         {/* Top bar */}
         <div style={{
-          borderBottom: `1px solid ${T.border}`, padding: '18px 32px',
+          borderBottom: `1px solid ${T.border}`, padding: window.innerWidth < 768 ? '14px 16px' : '18px 32px',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           backgroundColor: T.surface, position: 'sticky', top: 0, zIndex: 10,
         }}>
@@ -293,18 +319,19 @@ export function Dashboard() {
         </div>
 
         {/* Page content */}
-        <div style={{ padding: '28px 32px', maxWidth: '1200px' }}>
+        <div style={{ padding: window.innerWidth < 768 ? '16px 14px' : '28px 32px', maxWidth: '1200px' }}>
 
           {/* Stats row */}
           <div style={{
-            display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '14px', marginBottom: '24px',
-          }}>
+  display: 'grid',
+  gridTemplateColumns: window.innerWidth < 768 ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
+  gap: '14px', marginBottom: '24px',
+}}>
             {stats.map(s => <StatCard key={s.label} loading={loading} {...s} />)}
           </div>
 
           {/* Charts row */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '24px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 768 ? '1fr' : '1fr 1fr', gap: '14px', marginBottom: '24px' }}>
 
             {/* Pie chart */}
             <div style={{
@@ -389,7 +416,7 @@ export function Dashboard() {
           </div>
 
           {/* ── NEW: Work Queue + Commission Forecast row ── */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 768 ? '1fr' : '1fr 1fr', gap: '14px' }}>
 
             {/* Work Queue */}
             <div style={{

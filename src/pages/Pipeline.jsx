@@ -109,6 +109,20 @@ export function Pipeline() {
     if (!dragging || dragging.status === targetStatus) { setDragging(null); setDragOver(null); return }
     setLeads(prev => prev.map(l => l.id === dragging.id ? { ...l, status: targetStatus } : l))
     await supabase.from('leads').update({ status: targetStatus }).eq('id', dragging.id)
+
+    // Sync unit status based on lead stage
+    if (dragging.interested_unit_id) {
+      const unitStatus =
+        targetStatus === 'Won'                                        ? 'sold'
+        : targetStatus === 'Lost' || targetStatus === 'New'          ? 'available'
+        : targetStatus === 'Negotiation'                             ? 'booked'
+        : ['Contacted', 'In Progress', 'Site Visit'].includes(targetStatus) ? 'reserved'
+        : null
+
+      if (unitStatus) {
+        await supabase.from('units').update({ status: unitStatus }).eq('id', dragging.interested_unit_id)
+      }
+    }
     setDragging(null)
     setDragOver(null)
   }
@@ -127,12 +141,12 @@ export function Pipeline() {
         {/* Top bar */}
         <div style={{
           borderBottom: `1px solid ${T.border}`,
-          padding: '18px 32px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          backgroundColor: T.surface,
-          position: 'sticky',
+          padding: window.innerWidth < 768 ? '14px 16px' : '18px 32px',
+display: 'flex',
+alignItems: 'center',
+justifyContent: 'space-between',
+backgroundColor: T.surface,
+position: 'sticky',
           top: 0,
           zIndex: 10,
           flexShrink: 0,
@@ -156,14 +170,16 @@ export function Pipeline() {
         </div>
 
         {/* Board */}
-        <div style={{ flex: 1, overflowX: 'auto', padding: '24px 28px' }}>
+        <div style={{ flex: 1, overflowX: 'auto', padding: window.innerWidth < 768 ? '14px 12px' : '24px 28px' }}>
           {loading ? (
             <div style={{ display: 'flex', gap: '12px' }}>
               {[...Array(5)].map((_, i) => (
                 <div key={i} style={{
-                  flexShrink: 0, width: '224px', height: '400px',
-                  borderRadius: '10px', backgroundColor: T.surface,
-                  border: `1px solid ${T.border}`,
+                  flexShrink: 0,
+width: window.innerWidth < 768 ? '200px' : '224px',
+borderRadius: '10px',
+backgroundColor: T.surface,
+border: `1px solid ${T.border}`,
                   opacity: 1 - i * 0.1,
                 }} />
               ))}
@@ -184,7 +200,7 @@ export function Pipeline() {
                       width: '224px',
                       borderRadius: '10px',
                       backgroundColor: T.surface,
-                      border: `1px solid ${isOver ? col : T.border}`,
+                      border: `1px solid ${T.border}`,
                       overflow: 'hidden',
                       transition: 'border-color 0.15s, box-shadow 0.15s',
                       boxShadow: isOver ? `0 0 0 1px ${col}44, 0 0 16px ${col}18` : 'none',
