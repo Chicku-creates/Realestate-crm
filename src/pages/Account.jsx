@@ -228,6 +228,30 @@ export function Account() {
             </div>
           </div>
 
+        {/* Legal Links */}
+          <div style={{
+            paddingTop: '8px', paddingBottom: '32px',
+            display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center',
+          }}>
+            {[
+              { label: 'Terms & Conditions', href: '/terms' },
+              { label: 'Privacy Policy', href: '/privacy' },
+              { label: 'Shipping Policy', href: '/shipping' },
+              { label: 'Cancellation & Refunds', href: '/refunds' },
+              { label: 'Contact Us', href: '/contact' },
+            ].map(({ label, href }) => (
+              <a key={href} href={href} style={{
+                color: T.textMuted, fontSize: '12px', textDecoration: 'none',
+                borderBottom: `1px solid ${T.border}`, paddingBottom: '1px',
+              }}
+                onMouseEnter={e => e.target.style.color = T.accent}
+                onMouseLeave={e => e.target.style.color = T.textMuted}
+              >
+                {label}
+              </a>
+            ))}
+          </div>
+
         </div>
       </div>
     </Layout>

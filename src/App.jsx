@@ -11,6 +11,11 @@ import { Inventory } from './pages/Inventory'
 import { ProjectDetail } from './pages/ProjectDetail'
 import { SiteVisits } from './pages/SiteVisits'
 import { Account } from './pages/Account'
+import Terms from './pages/legal/Terms'
+import Privacy from './pages/legal/Privacy'
+import Shipping from './pages/legal/Shipping'
+import Contact from './pages/legal/Contact'
+import Refunds from './pages/legal/Refunds'
 
 function ProtectedRoute({ children }) {
   const { user } = useAuth()
@@ -25,9 +30,21 @@ function PublicRoute({ children }) {
 function AppRoutes() {
   return (
     <Routes>
+      {/* Auth */}
       <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
+
+      {/* Pricing */}
       <Route path="/pricing" element={<Pricing />} />
+
+      {/* Legal Pages - public, no auth needed */}
+      <Route path="/terms" element={<Terms />} />
+      <Route path="/privacy" element={<Privacy />} />
+      <Route path="/shipping" element={<Shipping />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/refunds" element={<Refunds />} />
+
+      {/* Protected App Routes */}
       <Route path="/dashboard" element={<ProtectedRoute><SubscriptionGuard><Dashboard /></SubscriptionGuard></ProtectedRoute>} />
       <Route path="/leads" element={<ProtectedRoute><SubscriptionGuard><Leads /></SubscriptionGuard></ProtectedRoute>} />
       <Route path="/pipeline" element={<ProtectedRoute><SubscriptionGuard><Pipeline /></SubscriptionGuard></ProtectedRoute>} />
@@ -35,6 +52,7 @@ function AppRoutes() {
       <Route path="/inventory/:projectId" element={<ProtectedRoute><SubscriptionGuard><ProjectDetail /></SubscriptionGuard></ProtectedRoute>} />
       <Route path="/visits" element={<ProtectedRoute><SubscriptionGuard><SiteVisits /></SubscriptionGuard></ProtectedRoute>} />
       <Route path="/account" element={<ProtectedRoute><SubscriptionGuard><Account /></SubscriptionGuard></ProtectedRoute>} />
+
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   )
