@@ -15,11 +15,11 @@ export function useSubscription() {
 
     const { data } = await supabase
       .from('profiles')
-      .select('subscription_status, subscription_plan, current_period_end')
+      .select('subscription_status, subscription_plan, current_period_end, trial_ends_at')
       .eq('id', user.id)
       .single();
 
-    // Auto-expire if past end date
+    // Auto-expire subscription if past end date
     if (data?.current_period_end) {
       const expired = new Date(data.current_period_end) < new Date();
       if (expired && data.subscription_status === 'active') {
@@ -35,6 +35,16 @@ export function useSubscription() {
     setLoading(false);
   }
 
+  const now = new Date();
+  const trialEnd = profile?.trial_ends_at ? new Date(profile.trial_ends_at) : null;
+  const isInTrial = trialEnd && now < trialEnd;
   const isSubscribed = profile?.subscription_status === 'active';
-  return { profile, loading, isSubscribed };
+  const hasAccess = isSubscribed || isInTrial;
+
+  // Days left in trial
+  const trialDaysLeft = isInTrial
+    ? Math.ceil((trialEnd - now) / (1000 * 60 * 60 * 24))
+    : 0;
+
+  return { profile, loading, isSubscribed, isInTrial, trialDaysLeft, hasAccess };
 }

@@ -1,3 +1,4 @@
+import { supabase } from '../lib/supabase'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
@@ -19,9 +20,20 @@ export function Signup() {
     if (password.length < 6) { setError('Password must be at least 6 characters'); return }
     setLoading(true)
     setError('')
-    const { error } = await signUp(email, password)
-    if (error) { setError(error.message); setLoading(false) }
-    else setSuccess(true)
+    const { data, error } = await signUp(email, password)
+if (error) { setError(error.message); setLoading(false) }
+else {
+  // Set 7-day free trial
+  if (data?.user) {
+    const trialEnd = new Date()
+    trialEnd.setDate(trialEnd.getDate() + 7)
+    await supabase.from('profiles').upsert({
+      id: data.user.id,
+      trial_ends_at: trialEnd.toISOString(),
+    })
+  }
+  setSuccess(true)
+}
   }
 
   if (success) return (

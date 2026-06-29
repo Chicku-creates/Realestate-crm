@@ -1,15 +1,16 @@
+import { supabase } from '../lib/supabase'
 import { useNavigate } from 'react-router-dom';
 import { useSubscription } from '../hooks/useSubscription';
 
 const T = {
   bg: '#13141F', surface: '#1A1C2E', text: '#E2E4F0',
   muted: '#8B8FA8', indigo: '#5C6BC0', purple: '#7C3AED',
-  border: '#2A2D4A',
+  border: '#2A2D4A', amber: '#F59E0B',
 };
 
 export default function SubscriptionGuard({ children }) {
   const navigate = useNavigate();
-  const { isSubscribed, loading } = useSubscription();
+  const { hasAccess, loading, isInTrial, trialDaysLeft } = useSubscription();
 
   if (loading) {
     return (
@@ -19,7 +20,7 @@ export default function SubscriptionGuard({ children }) {
     );
   }
 
-  if (!isSubscribed) {
+  if (!hasAccess) {
     return (
       <div style={{
         minHeight: '100vh', background: T.bg,
@@ -49,16 +50,45 @@ export default function SubscriptionGuard({ children }) {
           </button>
           <div style={{ marginTop: 16 }}>
             <button
-              onClick={() => navigate('/login')}
-              style={{ background: 'none', border: 'none', color: T.muted, cursor: 'pointer', fontSize: 13 }}
-            >
-              Sign in with a different account
-            </button>
+  onClick={async () => {
+    await supabase.auth.signOut()
+    navigate('/login')
+  }}
+  style={{ background: 'none', border: 'none', color: T.muted, cursor: 'pointer', fontSize: 13 }}
+>
+  Sign in with a different account
+</button>
           </div>
         </div>
       </div>
     );
   }
 
-  return children;
+  return (
+    <>
+      {/* Trial banner */}
+      {isInTrial && (
+        <div style={{
+          background: '#F59E0B18', borderBottom: `1px solid ${T.amber}44`,
+          padding: '8px 20px', display: 'flex', alignItems: 'center',
+          justifyContent: 'space-between', flexWrap: 'wrap', gap: 8,
+        }}>
+          <span style={{ color: T.amber, fontSize: 13 }}>
+            ⏳ Free trial — <strong>{trialDaysLeft} day{trialDaysLeft !== 1 ? 's' : ''}</strong> remaining
+          </span>
+          <button
+            onClick={() => navigate('/pricing')}
+            style={{
+              background: T.amber, color: '#000', border: 'none',
+              borderRadius: 6, padding: '4px 14px', fontSize: 12,
+              fontWeight: 700, cursor: 'pointer',
+            }}
+          >
+            Upgrade Now →
+          </button>
+        </div>
+      )}
+      {children}
+    </>
+  );
 }
