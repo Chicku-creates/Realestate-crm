@@ -30,11 +30,12 @@ export function Inventory() {
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
-  const [form, setForm] = useState({
-    builder_name: '', project_name: '', location: '',
-    type: 'apartment', rera_number: '', possession_date: '',
-    commission_percent: 2,
-  })
+const [editingId, setEditingId] = useState(null)
+const [form, setForm] = useState({
+  builder_name: '', project_name: '', location: '',
+  type: 'apartment', rera_number: '', possession_date: '',
+  commission_percent: 2,
+})
   const [saving, setSaving] = useState(false)
   const navigate = useNavigate()
   const [search, setSearch] = useState('')
@@ -59,15 +60,35 @@ export function Inventory() {
     fetchProjects()
   }
 
-  async function handleAddProject() {
-    setSaving(true)
+  function handleEditProject(e, project) {
+  e.stopPropagation()
+  setEditingId(project.id)
+  setForm({
+    builder_name: project.builder_name || '',
+    project_name: project.project_name || '',
+    location: project.location || '',
+    type: project.type || 'apartment',
+    rera_number: project.rera_number || '',
+    possession_date: project.possession_date || '',
+    commission_percent: project.commission_percent ?? 2,
+  })
+  setShowModal(true)
+}
+
+async function handleSaveProject() {
+  setSaving(true)
+  if (editingId) {
+    await supabase.from('projects').update(form).eq('id', editingId)
+  } else {
     const { data: { user } } = await supabase.auth.getUser()
     await supabase.from('projects').insert({ ...form, user_id: user.id })
-    setSaving(false)
-    setShowModal(false)
-    setForm({ builder_name: '', project_name: '', location: '', type: 'apartment', rera_number: '', possession_date: '', commission_percent: 2 })
-    fetchProjects()
   }
+  setSaving(false)
+  setShowModal(false)
+  setEditingId(null)
+  setForm({ builder_name: '', project_name: '', location: '', type: 'apartment', rera_number: '', possession_date: '', commission_percent: 2 })
+  fetchProjects()
+}
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: T.bg }}>
@@ -84,16 +105,7 @@ export function Inventory() {
             <h1 style={{ color: T.text, fontSize: '18px', fontWeight: 700, margin: 0 }}>Inventory</h1>
             <p style={{ color: T.textMuted, fontSize: '12px', margin: '2px 0 0' }}>{projects.length} projects</p>
           </div>
-          <button
-            onClick={() => setShowModal(true)}
-            style={{
-              backgroundColor: T.accent, color: 'white', border: 'none',
-              borderRadius: '8px', padding: '8px 16px', fontSize: '13px',
-              fontWeight: 600, cursor: 'pointer',
-            }}
-          >
-            + Add Project
-          </button>
+          onClick={() => { setEditingId(null); setShowModal(true) }}
         </div>
 
         {/* Projects Grid */}
@@ -204,20 +216,34 @@ export function Inventory() {
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                   }}>
                     <span style={{ color: T.textMuted, fontSize: '12px' }}>
-                      {project.units?.[0]?.count || 0} units
-                    </span>
-                    <button
-                      onClick={e => handleDeleteProject(e, project.id)}
-                      style={{
-                        background: 'transparent', border: `1px solid #EF444433`,
-                        borderRadius: '5px', padding: '3px 10px',
-                        color: T.danger, fontSize: '11px', cursor: 'pointer',
-                      }}
-                      onMouseEnter={e => e.currentTarget.style.backgroundColor = '#EF444411'}
-                      onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
-                    >
-                      🗑 Delete
-                    </button>
+  {project.units?.[0]?.count || 0} units
+</span>
+<div style={{ display: 'flex', gap: '8px' }}>
+  <button
+    onClick={e => handleEditProject(e, project)}
+    style={{
+      background: 'transparent', border: `1px solid ${T.accent}33`,
+      borderRadius: '5px', padding: '3px 10px',
+      color: T.accent, fontSize: '11px', cursor: 'pointer',
+    }}
+    onMouseEnter={e => e.currentTarget.style.backgroundColor = T.accent + '11'}
+    onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+  >
+    ✏️ Edit
+  </button>
+  <button
+    onClick={e => handleDeleteProject(e, project.id)}
+    style={{
+      background: 'transparent', border: `1px solid #EF444433`,
+      borderRadius: '5px', padding: '3px 10px',
+      color: T.danger, fontSize: '11px', cursor: 'pointer',
+    }}
+    onMouseEnter={e => e.currentTarget.style.backgroundColor = '#EF444411'}
+    onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+  >
+    🗑 Delete
+  </button>
+</div>
                   </div>
                 </div>
               ))}
@@ -237,8 +263,8 @@ export function Inventory() {
             borderRadius: '14px', padding: '28px', width: '480px', maxWidth: '90vw',
           }}>
             <h2 style={{ color: T.text, fontSize: '16px', fontWeight: 700, margin: '0 0 20px' }}>
-              Add New Project
-            </h2>
+  {editingId ? 'Edit Project' : 'Add New Project'}
+</h2>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {[
@@ -306,25 +332,25 @@ export function Inventory() {
 
             <div style={{ display: 'flex', gap: '10px', marginTop: '24px', justifyContent: 'flex-end' }}>
               <button
-                onClick={() => setShowModal(false)}
-                style={{
-                  padding: '8px 16px', borderRadius: '7px', border: `1px solid ${T.border}`,
-                  backgroundColor: 'transparent', color: T.textMuted, fontSize: '13px', cursor: 'pointer',
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleAddProject}
-                disabled={!form.project_name || !form.builder_name || saving}
-                style={{
-                  padding: '8px 20px', borderRadius: '7px', border: 'none',
-                  backgroundColor: T.accent, color: 'white', fontSize: '13px',
-                  fontWeight: 600, cursor: 'pointer', opacity: (!form.project_name || !form.builder_name) ? 0.5 : 1,
-                }}
-              >
-                {saving ? 'Saving...' : 'Add Project'}
-              </button>
+  onClick={() => { setShowModal(false); setEditingId(null) }}
+  style={{
+    padding: '8px 16px', borderRadius: '7px', border: `1px solid ${T.border}`,
+    backgroundColor: 'transparent', color: T.textMuted, fontSize: '13px', cursor: 'pointer',
+  }}
+>
+  Cancel
+</button>
+<button
+  onClick={handleSaveProject}
+  disabled={!form.project_name || !form.builder_name || saving}
+  style={{
+    padding: '8px 20px', borderRadius: '7px', border: 'none',
+    backgroundColor: T.accent, color: 'white', fontSize: '13px',
+    fontWeight: 600, cursor: 'pointer', opacity: (!form.project_name || !form.builder_name) ? 0.5 : 1,
+  }}
+>
+  {saving ? 'Saving...' : (editingId ? 'Save Changes' : 'Add Project')}
+</button>
             </div>
           </div>
         </div>
