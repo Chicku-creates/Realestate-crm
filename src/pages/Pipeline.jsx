@@ -95,9 +95,13 @@ export function Pipeline() {
   useEffect(() => {
     supabase
       .from('leads')
-      .select('*, units(*, projects(*))')
+      .select('*, units!leads_interested_unit_id_fkey(*, projects(*))')
       .eq('user_id', user.id)
-      .then(({ data }) => { setLeads(data || []); setLoading(false) })
+      .then(({ data, error }) => {
+        if (error) console.error('Pipeline leads fetch error:', error)
+        setLeads(data || [])
+        setLoading(false)
+      })
   }, [])
 
   const columns = LEAD_STATUSES.map(status => ({
