@@ -1,4 +1,4 @@
-export const RAZORPAY_KEY_ID = 'rzp_live_T7hE6Qeo8T9kfs'; // 🔁 Replace with your actual LIVE Key ID
+export const RAZORPAY_KEY_ID = 'rzp_live_T7m9B4kizl08Io'; // 🔁 Replace with your actual LIVE Key ID
 
 export const PLANS = {
   monthly: {
