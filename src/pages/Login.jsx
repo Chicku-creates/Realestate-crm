@@ -36,10 +36,14 @@ export function Login() {
 
   const handleGoogle = async () => {
     setGoogleLoading(true)
-    await supabase.auth.signInWithOAuth({
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: 'https://realestate-crm-azure.vercel.app/dashboard' }
     })
+    if (error) {
+      setError(error.message)
+      setGoogleLoading(false)
+    }
   }
 
   return (
