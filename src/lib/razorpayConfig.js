@@ -1,8 +1,8 @@
-export const RAZORPAY_KEY_ID = 'rzp_test_T6VexndEkxymnd'; // 🔁 Replace with your actual Key ID
+export const RAZORPAY_KEY_ID = 'rzp_live_T7hE6Qeo8T9kfs'; // 🔁 Replace with your actual LIVE Key ID
 
 export const PLANS = {
   monthly: {
-    id: 'plan_T6VlVPTdScTTFy',
+    id: 'plan_T7hIJXW7DgvEOc',
     name: 'Monthly',
     price: 299,
     billing: '/month',
@@ -10,7 +10,7 @@ export const PLANS = {
     badge: null,
   },
   quarterly: {
-    id: 'plan_T6Vmel0n9mmHiM',
+    id: 'plan_T7hJ9L2MMqPO6s',
     name: 'Quarterly',
     price: 799,
     billing: '/3 months',
@@ -18,7 +18,7 @@ export const PLANS = {
     badge: 'Popular',
   },
   halfyearly: {
-    id: 'plan_T6Vp9Q4hXf6sTo',
+    id: 'plan_T7hJs0mcVvVOA1',
     name: 'Half-Yearly',
     price: 1499,
     billing: '/6 months',
@@ -26,7 +26,7 @@ export const PLANS = {
     badge: 'Best Value',
   },
   annual: {
-    id: 'plan_T6Vu5VnkkT570J',
+    id: 'plan_T7hKRBpGnlIikw',
     name: 'Annual',
     price: 2999,
     billing: '/year',
