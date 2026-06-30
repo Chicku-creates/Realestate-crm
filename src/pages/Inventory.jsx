@@ -290,32 +290,19 @@ async function handleSaveProject() {
                 </div>
               ))}
 
-              <div style={{ display: 'flex', gap: '12px' }}>
-                <div style={{ flex: 1 }}>
-                  <label style={{ color: T.textSub, fontSize: '11px', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Type</label>
-                  <select
-                    value={form.type}
-                    onChange={e => setForm(f => ({ ...f, type: e.target.value }))}
-                    style={{
-                      width: '100%', backgroundColor: T.bg, border: `1px solid ${T.border}`,
-                      borderRadius: '7px', padding: '8px 12px', color: T.text, fontSize: '13px', outline: 'none',
-                    }}
-                  >
-                    {PROJECT_TYPES.map(t => <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>)}
-                  </select>
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label style={{ color: T.textSub, fontSize: '11px', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Commission %</label>
-                  <input
-                    type="number" value={form.commission_percent}
-                    onChange={e => setForm(f => ({ ...f, commission_percent: e.target.value }))}
-                    style={{
-                      width: '100%', backgroundColor: T.bg, border: `1px solid ${T.border}`,
-                      borderRadius: '7px', padding: '8px 12px', color: T.text, fontSize: '13px', outline: 'none', boxSizing: 'border-box',
-                    }}
-                  />
-                </div>
-              </div>
+              <div>
+  <label style={{ color: T.textSub, fontSize: '11px', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Type</label>
+  <select
+    value={form.type}
+    onChange={e => setForm(f => ({ ...f, type: e.target.value }))}
+    style={{
+      width: '100%', backgroundColor: T.bg, border: `1px solid ${T.border}`,
+      borderRadius: '7px', padding: '8px 12px', color: T.text, fontSize: '13px', outline: 'none',
+    }}
+  >
+    {PROJECT_TYPES.map(t => <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>)}
+  </select>
+</div>
 
               <div>
                 <label style={{ color: T.textSub, fontSize: '11px', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Possession Date</label>
