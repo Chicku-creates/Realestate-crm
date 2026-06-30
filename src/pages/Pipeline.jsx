@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import { Layout } from '../components/Layout'
 import { LEAD_STATUSES } from '../lib/utils'
+import { LeadDetailModal } from '../components/LeadDetailModal'
 
 const T = {
   bg:       '#13141F',
@@ -34,12 +35,13 @@ const STATUS_ACCENT = {
 
 const accent = (status) => STATUS_ACCENT[status] || T.indigo
 
-function DragCard({ lead, col, isDragging, onDragStart }) {
+function DragCard({ lead, col, isDragging, onDragStart, onClick }) {
   const [hovered, setHovered] = useState(false)
   return (
     <div
       draggable
       onDragStart={e => onDragStart(e, lead)}
+      onClick={() => onClick(lead)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
@@ -88,9 +90,13 @@ export function Pipeline() {
   const [loading, setLoading] = useState(true)
   const [dragging, setDragging] = useState(null)
   const [dragOver, setDragOver] = useState(null)
+  const [selectedLead, setSelectedLead] = useState(null)
 
   useEffect(() => {
-    supabase.from('leads').select('*').eq('user_id', user.id)
+    supabase
+      .from('leads')
+      .select('*, units(*, projects(*))')
+      .eq('user_id', user.id)
       .then(({ data }) => { setLeads(data || []); setLoading(false) })
   }, [])
 
@@ -242,6 +248,7 @@ border: `1px solid ${T.border}`,
                           col={col}
                           isDragging={dragging?.id === lead.id}
                           onDragStart={handleDragStart}
+                          onClick={setSelectedLead}
                         />
                       ))}
                       {colLeads.length === 0 && (
@@ -267,6 +274,14 @@ border: `1px solid ${T.border}`,
           )}
         </div>
       </div>
+
+      {selectedLead && (
+        <LeadDetailModal
+          lead={selectedLead}
+          onClose={() => setSelectedLead(null)}
+          onEdit={() => setSelectedLead(null)}
+        />
+      )}
     </Layout>
   )
 }

@@ -90,7 +90,7 @@ export function Signup() {
   )
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', fontFamily: 'system-ui, sans-serif', backgroundColor: T.bg }}>
+    <div className="auth-container" style={{ minHeight: '100vh', display: 'flex', fontFamily: 'system-ui, sans-serif', backgroundColor: T.bg }}>
 
       {/* Left Panel */}
       <div style={{
@@ -156,7 +156,7 @@ export function Signup() {
       </div>
 
       {/* Right Panel - Form */}
-      <div style={{ width: '480px', flexShrink: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '48px 48px', overflowY: 'auto' }}>
+      <div className="auth-right-panel" style={{ width: '480px', flexShrink: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '48px 48px', overflowY: 'auto' }}>
         
         {/* Mobile logo */}
         <div style={{ display: 'none', alignItems: 'center', gap: 10, marginBottom: 32 }} className="show-on-mobile">
@@ -175,6 +175,7 @@ export function Signup() {
           <span style={{ color: T.emerald, fontSize: 13, fontWeight: 500 }}>7 days free — full access, no payment needed</span>
         </div>
 
+        <div className="auth-card">
         {error && (
           <div style={{ backgroundColor: '#EF444415', border: '1px solid #EF444440', borderRadius: 10, padding: '10px 16px', color: '#EF4444', fontSize: 13, marginBottom: 20 }}>
             {error}
@@ -251,6 +252,8 @@ export function Signup() {
           </button>
         </div>
 
+        </div>
+
         <p style={{ color: T.muted, fontSize: 12, textAlign: 'center', marginTop: 20, lineHeight: 1.6 }}>
           By signing up you agree to our{' '}
           <a href="/terms" style={{ color: T.indigo }}>Terms</a> and{' '}
@@ -266,7 +269,24 @@ export function Signup() {
       <style>{`
         @media (max-width: 768px) {
           .hide-on-mobile { display: none !important; }
-          .show-on-mobile { display: flex !important; }
+          .show-on-mobile { display: flex !important; justify-content: center; }
+          .auth-container {
+            flex-direction: column;
+            background: linear-gradient(160deg, #1A1C2E 0%, #13141F 55%, #1a1235 100%);
+          }
+          .auth-right-panel {
+            width: 100% !important;
+            padding: 40px 20px !important;
+            justify-content: flex-start !important;
+            min-height: 100vh;
+          }
+          .auth-card {
+            background: ${T.surface};
+            border: 1px solid ${T.border};
+            border-radius: 20px;
+            padding: 28px 22px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+          }
         }
       `}</style>
     </div>

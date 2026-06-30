@@ -47,10 +47,10 @@ export function Login() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', fontFamily: 'system-ui, sans-serif', backgroundColor: T.bg }}>
+    <div className="auth-container" style={{ minHeight: '100vh', display: 'flex', fontFamily: 'system-ui, sans-serif', backgroundColor: T.bg }}>
 
       {/* Left Panel */}
-      <div style={{
+      <div className="auth-left-panel" style={{
         flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
         padding: '48px', background: `linear-gradient(160deg, #1A1C2E 0%, #13141F 60%, #1a1235 100%)`,
         borderRight: `1px solid ${T.border}`, minWidth: 0,
@@ -100,13 +100,19 @@ export function Login() {
       </div>
 
       {/* Right Panel */}
-      <div style={{ width: '480px', flexShrink: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '48px', overflowY: 'auto' }}>
+      <div className="auth-right-panel" style={{ width: '480px', flexShrink: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '48px', overflowY: 'auto' }}>
+
+        <div className="auth-mobile-logo" style={{ display: 'none', alignItems: 'center', gap: 10, marginBottom: 32, justifyContent: 'center' }}>
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: `linear-gradient(135deg, ${T.indigo}, ${T.purple})`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>🏠</div>
+          <span style={{ fontSize: 22, fontWeight: 800, color: T.text }}>Prop<span style={{ color: T.indigo }}>CRM</span></span>
+        </div>
 
         <div style={{ marginBottom: 32 }}>
           <h2 style={{ color: T.text, fontSize: 26, fontWeight: 700, margin: '0 0 8px' }}>Sign in</h2>
           <p style={{ color: T.muted, fontSize: 14, margin: 0 }}>Enter your credentials to access your account</p>
         </div>
 
+        <div className="auth-card">
         {error && (
           <div style={{ backgroundColor: '#EF444415', border: '1px solid #EF444440', borderRadius: 10, padding: '10px 16px', color: '#EF4444', fontSize: 13, marginBottom: 20 }}>
             {error}
@@ -176,6 +182,8 @@ export function Login() {
           </button>
         </div>
 
+        </div>
+
         <p style={{ color: T.muted, fontSize: 14, textAlign: 'center', marginTop: 24 }}>
           Don't have an account?{' '}
           <Link to="/signup" style={{ color: T.indigo, fontWeight: 600 }}>Sign up free</Link>
@@ -185,6 +193,25 @@ export function Login() {
       <style>{`
         @media (max-width: 768px) {
           .hide-on-mobile { display: none !important; }
+          .auth-container {
+            flex-direction: column;
+            background: linear-gradient(160deg, #1A1C2E 0%, #13141F 55%, #1a1235 100%);
+          }
+          .auth-left-panel { display: none !important; }
+          .auth-mobile-logo { display: flex !important; }
+          .auth-right-panel {
+            width: 100% !important;
+            padding: 40px 20px !important;
+            justify-content: flex-start !important;
+            min-height: 100vh;
+          }
+          .auth-card {
+            background: ${T.surface};
+            border: 1px solid ${T.border};
+            border-radius: 20px;
+            padding: 28px 22px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+          }
         }
       `}</style>
     </div>
