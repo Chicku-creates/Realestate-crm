@@ -30,7 +30,7 @@ const BHK_OPTIONS = ['1BHK', '2BHK', '3BHK', '4BHK', 'Studio', 'Villa', 'Plot']
 
 const EMPTY_UNIT = {
   unit_number: '', bhk_type: '2BHK', floor_number: '',
-  area_sqft: '', price: '', status: 'available',
+  area_sqft: '', price: '', status: 'available', commission_percent: 2,
 }
 
 export function ProjectDetail() {
@@ -84,17 +84,18 @@ const [filterPriceMax, setFilterPriceMax] = useState('')
   }
 
   function openEdit(unit) {
-    setEditingUnit(unit)
-    setForm({
-      unit_number: unit.unit_number,
-      bhk_type: unit.bhk_type,
-      floor_number: unit.floor_number,
-      area_sqft: unit.area_sqft,
-      price: unit.price,
-      status: unit.status,
-    })
-    setShowModal(true)
-  }
+  setEditingUnit(unit)
+  setForm({
+    unit_number: unit.unit_number,
+    bhk_type: unit.bhk_type,
+    floor_number: unit.floor_number,
+    area_sqft: unit.area_sqft,
+    price: unit.price,
+    status: unit.status,
+    commission_percent: unit.commission_percent ?? 2,
+  })
+  setShowModal(true)
+}
 
   const hasAdvancedFilter = filterBhk !== 'all' || filterAreaMin || filterAreaMax || filterPriceMin || filterPriceMax
 
@@ -343,12 +344,12 @@ const filtered = units.filter(u => {
               {/* Table header */}
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: '1fr 1fr 80px 100px 120px 110px 100px',
+                gridTemplateColumns: '1fr 1fr 80px 100px 120px 90px 110px 100px',
                 padding: '10px 16px',
                 borderBottom: `1px solid ${T.border}`,
                 backgroundColor: '#14152280',
               }}>
-                {['Unit', 'Type', 'Floor', 'Area (sqft)', 'Price (₹)', 'Status', 'Actions'].map(h => (
+                {['Unit', 'Type', 'Floor', 'Area (sqft)', 'Price (₹)', 'Comm. %', 'Status', 'Actions'].map(h => (
                   <span key={h} style={{ color: T.textMuted, fontSize: '11px', fontWeight: 600 }}>{h}</span>
                 ))}
               </div>
@@ -361,7 +362,7 @@ const filtered = units.filter(u => {
                     key={unit.id}
                     style={{
                       display: 'grid',
-                      gridTemplateColumns: '1fr 1fr 80px 100px 120px 110px 100px',
+                      gridTemplateColumns: '1fr 1fr 80px 100px 120px 90px 110px 100px',
                       padding: '12px 16px',
                       borderBottom: i < filtered.length - 1 ? `1px solid ${T.border}` : 'none',
                       alignItems: 'center',
@@ -372,15 +373,18 @@ const filtered = units.filter(u => {
                     <span style={{ color: T.textSub, fontSize: '13px' }}>{unit.floor_number ?? '—'}</span>
                     <span style={{ color: T.textSub, fontSize: '13px' }}>{unit.area_sqft ? `${unit.area_sqft}` : '—'}</span>
                     <span style={{ color: T.text, fontSize: '13px', fontWeight: 500 }}>
-                      {unit.price ? `₹${Number(unit.price).toLocaleString('en-IN')}` : '—'}
-                    </span>
-                    <span style={{
-                      display: 'inline-block', padding: '3px 10px', borderRadius: '20px',
-                      fontSize: '11px', fontWeight: 600,
-                      backgroundColor: s.bg, color: s.color,
-                    }}>
-                      {s.label}
-                    </span>
+  {unit.price ? `₹${Number(unit.price).toLocaleString('en-IN')}` : '—'}
+</span>
+<span style={{ color: T.success, fontSize: '13px', fontWeight: 600 }}>
+  {unit.commission_percent ?? '—'}%
+</span>
+<span style={{
+  display: 'inline-block', padding: '3px 10px', borderRadius: '20px',
+  fontSize: '11px', fontWeight: 600,
+  backgroundColor: s.bg, color: s.color,
+}}>
+  {s.label}
+</span>
                     <div style={{ display: 'flex', gap: '8px' }}>
                       <button
                         onClick={() => openEdit(unit)}
@@ -498,11 +502,25 @@ const filtered = units.filter(u => {
                 </div>
               </div>
 
-              <div>
-                <label style={{ color: T.textSub, fontSize: '11px', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Status</label>
-                <select
-                  value={form.status}
-                  onChange={e => setForm(f => ({ ...f, status: e.target.value }))}
+              <div style={{ display: 'flex', gap: '12px' }}>
+  <div style={{ flex: 1 }}>
+    <label style={{ color: T.textSub, fontSize: '11px', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Commission %</label>
+    <input
+      type="number" value={form.commission_percent}
+      onChange={e => setForm(f => ({ ...f, commission_percent: e.target.value }))}
+      placeholder="e.g. 2"
+      style={{
+        width: '100%', backgroundColor: T.bg, border: `1px solid ${T.border}`,
+        borderRadius: '7px', padding: '8px 12px', color: T.text,
+        fontSize: '13px', outline: 'none', boxSizing: 'border-box',
+      }}
+    />
+  </div>
+  <div style={{ flex: 1 }}>
+    <label style={{ color: T.textSub, fontSize: '11px', fontWeight: 600, display: 'block', marginBottom: '4px' }}>Status</label>
+    <select
+      value={form.status}
+      onChange={e => setForm(f => ({ ...f, status: e.target.value }))}
                   style={{
                     width: '100%', backgroundColor: T.bg, border: `1px solid ${T.border}`,
                     borderRadius: '7px', padding: '8px 12px', color: T.text, fontSize: '13px', outline: 'none',
@@ -514,6 +532,7 @@ const filtered = units.filter(u => {
                 </select>
               </div>
             </div>
+          </div>
 
             <div style={{ display: 'flex', gap: '10px', marginTop: '24px', justifyContent: 'flex-end' }}>
               <button
