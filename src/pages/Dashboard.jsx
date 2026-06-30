@@ -150,14 +150,14 @@ export function Dashboard() {
     const fetchData = async () => {
       const [{ data: leadsData }, { data: unitsData }] = await Promise.all([
         supabase.from('leads')
-          .select(`
-            *,
-            units!leads_interested_unit_id_fkey (
-              id, unit_number, bhk_type, floor_number, price, status,
-              projects ( id, project_name, builder_name, commission_percent )
-            )
-          `)
-          .eq('user_id', user.id),
+  .select(`
+    *,
+    units!leads_interested_unit_id_fkey (
+      id, unit_number, bhk_type, floor_number, price, status, commission_percent,
+      projects ( id, project_name, builder_name )
+    )
+  `)
+  .eq('user_id', user.id),
         supabase.from('units')
           .select('*, projects!inner(user_id, commission_percent)')
           .eq('projects.user_id', user.id)
@@ -234,13 +234,13 @@ export function Dashboard() {
     })
     .slice(0, 8)
     // ── Total Earnings (Won leads with linked unit) ──
-  const wonLeads = leads.filter(l => l.status === 'Won' && l.units?.price && l.units?.projects?.commission_percent)
+  const wonLeads = leads.filter(l => l.status === 'Won' && l.units?.price)
 
   const calcEarning = (lead) => {
-    const price = lead.units?.price || 0
-    const pct   = lead.units?.projects?.commission_percent || 0
-    return price * (pct / 100)
-  }
+  const price = lead.units?.price || 0
+  const pct   = lead.units?.commission_percent ?? 2
+  return price * (pct / 100)
+}
 
   const totalEarnings = wonLeads.reduce((sum, l) => sum + calcEarning(l), 0)
 
@@ -256,10 +256,10 @@ export function Dashboard() {
   const reservedUnits = units.filter(u => u.status === 'reserved')
 
   const calcCommission = (unitsList) =>
-    unitsList.reduce((sum, u) => {
-      const commPct = u.projects?.commission_percent || 2
-      return sum + (u.price || 0) * (commPct / 100)
-    }, 0)
+  unitsList.reduce((sum, u) => {
+    const commPct = u.commission_percent ?? 2
+    return sum + (u.price || 0) * (commPct / 100)
+  }, 0)
 
   const bookedCommission   = calcCommission(bookedUnits)
   const reservedCommission = calcCommission(reservedUnits)
@@ -519,8 +519,8 @@ export function Dashboard() {
                             </span>
                           </div>
                           <span style={{ fontSize: '12px', fontWeight: 600, color: T.emerald }}>
-                            {formatINR((u.price || 0) * ((u.projects?.commission_percent || 2) / 100))}
-                          </span>
+  {formatINR((u.price || 0) * ((u.commission_percent ?? 2) / 100))}
+</span>
                         </div>
                       ))}
                       {units.length > 4 && (
