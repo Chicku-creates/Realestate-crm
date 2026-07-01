@@ -84,7 +84,8 @@ function Nav() {
         PropCRM
       </Link>
       <div style={{ display: 'flex', gap: 28, alignItems: 'center' }}>
-        <Link to="/pricing" style={{ color: '#B8BCD4', textDecoration: 'none', fontSize: 14.5, fontWeight: 500 }}>Pricing</Link>
+        <Link to="/" style={{ color: '#B8BCD4', textDecoration: 'none', fontSize: 14.5, fontWeight: 500 }}>Home</Link>
+<Link to="/pricing" style={{ color: '#B8BCD4', textDecoration: 'none', fontSize: 14.5, fontWeight: 500 }}>Pricing</Link>
         <Link to="/about" style={{ color: '#fff', textDecoration: 'none', fontSize: 14.5, fontWeight: 600 }}>About</Link>
         <Link to="/contact" style={{ color: '#B8BCD4', textDecoration: 'none', fontSize: 14.5, fontWeight: 500 }}>Contact</Link>
         <Link to="/login" style={{ color: '#fff', textDecoration: 'none', fontSize: 14.5, fontWeight: 600 }}>Log in</Link>

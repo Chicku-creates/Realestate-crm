@@ -75,15 +75,16 @@ function Nav() {
         transition: 'all 0.3s ease',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontWeight: 800, fontSize: 20, color: '#fff', letterSpacing: '-0.02em' }}>
+      <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10, fontWeight: 800, fontSize: 20, color: '#fff', textDecoration: 'none', letterSpacing: '-0.02em' }}>
         <span style={{
           width: 30, height: 30, borderRadius: 8,
           background: `linear-gradient(135deg, ${T.indigo}, ${T.purple})`,
           display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15
         }}>P</span>
         PropCRM
-      </div>
+      </Link>
       <div style={{ display: 'flex', gap: 28, alignItems: 'center' }}>
+        <Link to="/" style={{ color: '#fff', textDecoration: 'none', fontSize: 14.5, fontWeight: 600 }}>Home</Link>
         <Link to="/pricing" style={{ color: '#B8BCD4', textDecoration: 'none', fontSize: 14.5, fontWeight: 500 }}>Pricing</Link>
         <Link to="/about" style={{ color: '#B8BCD4', textDecoration: 'none', fontSize: 14.5, fontWeight: 500 }}>About</Link>
         <Link to="/contact" style={{ color: '#B8BCD4', textDecoration: 'none', fontSize: 14.5, fontWeight: 500 }}>Contact</Link>
@@ -246,6 +247,78 @@ export default function Home() {
         </Reveal>
         <Reveal delay={0.32}>
           <PipelineHero />
+        </Reveal>
+      </section>
+
+      {/* FEATURED MODULES SHOWCASE (Zoho-style card) */}
+      <section style={{ padding: '0 24px 80px', maxWidth: 1100, margin: '0 auto' }}>
+        <Reveal>
+          <div style={{
+            background: T.surface, border: `1px solid ${T.border}`, borderRadius: 20,
+            overflow: 'hidden',
+          }}>
+            {/* Preview panel */}
+            <div style={{
+              background: `linear-gradient(135deg, ${T.elevated}, ${T.bg})`,
+              padding: '48px 32px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              borderBottom: `1px solid ${T.border}`,
+            }}>
+              <div style={{
+                width: '100%', maxWidth: 420, borderRadius: 14, background: T.elevated,
+                border: `1px solid ${T.indigo}55`, padding: 20, boxShadow: `0 20px 60px -20px ${T.indigo}55`,
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+                  <span style={{ width: 8, height: 8, borderRadius: 999, background: T.rose }} />
+                  <span style={{ width: 8, height: 8, borderRadius: 999, background: T.amber }} />
+                  <span style={{ width: 8, height: 8, borderRadius: 999, background: T.emerald }} />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {['New Lead - Raj Malhotra', 'Site Visit - Sector 82', 'Deal Closed - 2BHK'].map((row, i) => (
+                    <div key={row} style={{
+                      display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px',
+                      background: T.surface, borderRadius: 8, fontSize: 12.5, color: '#B8BCD4',
+                    }}>
+                      <span style={{
+                        width: 6, height: 6, borderRadius: 999,
+                        background: [T.sky, T.amber, T.emerald][i],
+                      }} />
+                      {row}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Module tile row */}
+            <div style={{ padding: '28px 32px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
+                <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#7B7F9E' }}>
+                  Core modules
+                </span>
+                <Link to="/about" style={{ fontSize: 13.5, color: T.indigo, textDecoration: 'none', fontWeight: 600 }}>
+                  Explore all features -&gt;
+                </Link>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 16 }}>
+                {[
+                  { label: 'Leads', code: 'LD', color: T.sky },
+                  { label: 'Pipeline', code: 'PL', color: T.indigo },
+                  { label: 'Inventory', code: 'IN', color: T.purple },
+                  { label: 'Site Visits', code: 'SV', color: T.amber },
+                  { label: 'Commission', code: 'CM', color: T.emerald },
+                ].map((m) => (
+                  <div key={m.label} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{
+                      width: 36, height: 36, borderRadius: 9, background: m.color + '22',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 12, fontWeight: 800, color: m.color,
+                    }}>{m.code}</div>
+                    <span style={{ fontSize: 13.5, color: '#B8BCD4', fontWeight: 500 }}>{m.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </Reveal>
       </section>
 
