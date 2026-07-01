@@ -84,22 +84,13 @@ function Nav() {
         PropCRM
       </Link>
       <div style={{ display: 'flex', gap: 28, alignItems: 'center' }}>
-        <Link to="/" style={{ color: '#fff', textDecoration: 'none', fontSize: 14.5, fontWeight: 600 }}>Home</Link>
-        <Link to="/pricing" style={{ color: '#B8BCD4', textDecoration: 'none', fontSize: 14.5, fontWeight: 500 }}>Pricing</Link>
-        <Link to="/about" style={{ color: '#B8BCD4', textDecoration: 'none', fontSize: 14.5, fontWeight: 500 }}>About</Link>
-        <Link to="/contact" style={{ color: '#B8BCD4', textDecoration: 'none', fontSize: 14.5, fontWeight: 500 }}>Contact</Link>
-        <Link to="/login" style={{ color: '#fff', textDecoration: 'none', fontSize: 14.5, fontWeight: 600 }}>Log in</Link>
-        <Link
-          to="/signup"
-          style={{
-            background: T.indigo, color: '#fff', textDecoration: 'none',
-            padding: '9px 18px', borderRadius: 8, fontSize: 14.5, fontWeight: 600,
-            boxShadow: `0 0 0 1px ${T.indigo}55`,
-          }}
-        >
-          Start free trial
-        </Link>
-      </div>
+  <Link to="/" style={{ color: '#fff', textDecoration: 'none', fontSize: 14.5, fontWeight: 600 }}>Home</Link>
+  <Link to="/pricing" style={{ color: '#B8BCD4', textDecoration: 'none', fontSize: 14.5, fontWeight: 500 }}>Pricing</Link>
+  <Link to="/about" style={{ color: '#B8BCD4', textDecoration: 'none', fontSize: 14.5, fontWeight: 500 }}>About</Link>
+  <Link to="/contact" style={{ color: '#B8BCD4', textDecoration: 'none', fontSize: 14.5, fontWeight: 500 }}>Contact</Link>
+  <Link to="/login" style={{ color: '#fff', textDecoration: 'none', fontSize: 14.5, fontWeight: 600 }}>Log in</Link>
+  <Link to="/signup" style={{ background: T.indigo, color: '#fff', textDecoration: 'none', padding: '9px 18px', borderRadius: 8, fontSize: 14.5, fontWeight: 600, boxShadow: `0 0 0 1px ${T.indigo}55` }}>Start free trial</Link>
+</div>
     </nav>
   )
 }
