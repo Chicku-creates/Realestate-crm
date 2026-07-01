@@ -79,7 +79,7 @@ export function Navbar() {
 
   const handleSignOut = async () => {
     await signOut()
-    navigate('/login')
+    navigate('/')
   }
 
   const initials = user?.email ? user.email.slice(0, 2).toUpperCase() : 'U'

@@ -1,4 +1,6 @@
 import Pricing from './pages/Pricing'
+import Home from './pages/Home'
+import About from './pages/About'
 import SubscriptionGuard from './components/SubscriptionGuard'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
@@ -27,9 +29,18 @@ function PublicRoute({ children }) {
   return !user ? children : <Navigate to="/dashboard" replace />
 }
 
+function HomeRoute({ children }) {
+  const { user } = useAuth()
+  return user ? <Navigate to="/dashboard" replace /> : children
+}
+
 function AppRoutes() {
   return (
     <Routes>
+      {/* Landing */}
+      <Route path="/" element={<HomeRoute><Home /></HomeRoute>} />
+      <Route path="/about" element={<About />} />
+
       {/* Auth */}
       <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
